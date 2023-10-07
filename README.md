@@ -1,4 +1,5 @@
-# mute_plugin
+# nonebot-plugin-mute
+
 自用nonebot2 QQ群投票禁言插件
 
 功能：
