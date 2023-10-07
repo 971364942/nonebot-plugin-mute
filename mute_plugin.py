@@ -15,7 +15,7 @@ at_dict = {}
 # 存储每个人上次发送口他的时间
 cd_dict = {}
 
-CommandsFile = 'data/commands.json'
+CommandsFile = 'data/mute_commands.json'
 
 group_commands_config = {}
 
@@ -37,7 +37,8 @@ async def check_password(bot: Bot, event: GroupMessageEvent, state: T_State):
 
     # 获取群号对应的口令列表
     group_commands = group_commands_config.get(str(group_id), [])
-    group_commands.append('口他')
+    if "口他" not in group_commands:
+        group_commands.append("口他")
 
     # 检查消息是否是口令a
     for command in group_commands:
@@ -66,8 +67,9 @@ async def check_password(bot: Bot, event: GroupMessageEvent, state: T_State):
             await bot.set_group_ban(group_id=group_id, user_id=user_id, duration=mute_time)
             await matcher.finish(Message("谁给你的勇气口我的！"))
 
-    # @了管理员或者群主    
-    if not IsAdmin(bot, event, at_qq):
+    # @了管理员或者群主  
+    member_info =  await bot.get_group_member_info(group_id=group_id, user_id=at_qq)
+    if member_info['role'] == "owner" or member_info['role'] == "admin":  
         await matcher.finish(Message("这位可口不得"))
 
     # 获取当前时间
@@ -101,14 +103,6 @@ async def check_password(bot: Bot, event: GroupMessageEvent, state: T_State):
     else:
         msg = MessageSegment(type='at', data={'qq': at_qq}) + f"当前已被投{len(at_dict[at_qq])}票，5分钟内超过3票将会被禁言1-10分钟。"
         await matcher.finish(Message(msg))
-
-# 检查是否是管理员
-async def IsAdmin(bot: Bot, event: GroupMessageEvent, qqNum):
-    member_info =  await bot.get_group_member_info(group_id=event.group_id, user_id=qqNum)
-    if member_info['role'] == "owner" or member_info['role'] == "admin":
-        return True
-    else:
-        return False 
     
 # 增加指令
 matcher2 = on_startswith(("增加指令", "添加指令"))
@@ -132,13 +126,17 @@ def add_command(group_id, new_command):
 
     global group_commands_config
 
+    add_group_commands = []
+
     # 获取群号对应的指令列表
-    group_commands = group_commands_config.get(str(group_id), [])
+    add_group_commands = group_commands_config.get(str(group_id), [])
     
     # 添加新的口他指令
-    group_commands.append(new_command)
+    add_group_commands.append(new_command)
+    if "口他" in add_group_commands:
+        add_group_commands.remove("口他")
 
     # 更新配置文件
-    group_commands_config[str(group_id)] = group_commands
+    group_commands_config[str(group_id)] = add_group_commands
     with open(CommandsFile, 'w', encoding='utf-8') as file:
         json.dump(group_commands_config, file, ensure_ascii=False, indent=4)    
