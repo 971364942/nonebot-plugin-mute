@@ -28,7 +28,7 @@ except FileNotFoundError:
         json.dump({}, file, ensure_ascii=False, indent=4)
     group_commands_config = {} 
 
-matcher = on_message()
+matcher = on_message(block=True)
 @matcher.handle()
 async def check_password(bot: Bot, event: GroupMessageEvent, state: T_State):
 
