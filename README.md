@@ -7,5 +7,7 @@
 
 ![image](https://github.com/971364942/mute_plugin/assets/43522771/9e2b0d87-3984-4583-be2c-4a3d4ce6b0f5)
 
+![Uploading image.png…]()
+
 
 需要管理员权限
