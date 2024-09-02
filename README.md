@@ -7,7 +7,6 @@
 
 ![image](https://github.com/971364942/mute_plugin/assets/43522771/9e2b0d87-3984-4583-be2c-4a3d4ce6b0f5)
 
-![Uploading image.png…]()
-
+![I4 $BYY75`U(YL_Z7 0HLMD](https://github.com/user-attachments/assets/a6e6d451-1e36-45b0-b754-591e3e659def)
 
 需要管理员权限
