@@ -28,7 +28,7 @@ except FileNotFoundError:
         json.dump({}, file, ensure_ascii=False, indent=4)
     group_commands_config = {} 
 
-matcher = on_message(block=True)
+matcher = on_message(block=False)
 @matcher.handle()
 async def check_password(bot: Bot, event: GroupMessageEvent, state: T_State):
 
@@ -40,9 +40,10 @@ async def check_password(bot: Bot, event: GroupMessageEvent, state: T_State):
     if "口他" not in group_commands:
         group_commands.append("口他")
 
-    # 检查消息是否是口令a
+    # 检查消息是否是口令
+    new_message = re.sub(r'\[CQ:at,qq=(\d+)\]', '', message)
     for command in group_commands:
-        if command in message:
+        if command in new_message:
             break
     else:
         return
@@ -65,7 +66,7 @@ async def check_password(bot: Bot, event: GroupMessageEvent, state: T_State):
         else:
             mute_time = random.randint(60, 600)
             await bot.set_group_ban(group_id=group_id, user_id=user_id, duration=mute_time)
-            await matcher.finish(Message("谁给你的勇气口我的！"))
+            await matcher.finish(Message("mua~"))
 
     # @了管理员或者群主  
     member_info =  await bot.get_group_member_info(group_id=group_id, user_id=at_qq)
@@ -79,7 +80,7 @@ async def check_password(bot: Bot, event: GroupMessageEvent, state: T_State):
     last_time = cd_dict.get((user_id, group_id), 0)
     
     # 检查是否在冷却时间内且不是管理员
-    if now_time - last_time < 300 and not (event.sender.role == "owner" or event.sender.role == "admin"):
+    if now_time - last_time < 300 and not (event.sender.role == "owner" or event.sender.role == "admin" or event.sender.user_id == 2854203783):
         await matcher.finish(Message("你口太快了！"), reply_message=True)
     
     # 更新冷却时间
@@ -111,9 +112,25 @@ async def add_command_handler(bot: Bot, event: GroupMessageEvent, state: T_State
     # 从消息中提取新指令
     new_command = event.raw_message.lstrip("增加指令").lstrip("添加指令").strip()
 
-
     if not new_command:
         await matcher2.finish("新指令不能为空哦！")
+
+    if len(new_command) < 2:
+        await matcher2.finish("新指令不能少于两个字哦！")
+
+    if "CQ:at" in new_command:
+        if event.sender.role == "owner" or event.sender.role == "admin":
+            await matcher.finish(Message("求求你别乱加了呜呜呜"))
+        else:
+            await bot.set_group_ban(group_id=group_id, user_id=user_id, duration=600)
+            await matcher.finish(Message("就是你乱加是吧！死！"))
+
+    if "指令" in new_command:
+        if event.sender.role == "owner" or event.sender.role == "admin":
+            await matcher.finish(Message("求求你别乱加了呜呜呜"))
+        else:
+            await bot.set_group_ban(group_id=group_id, user_id=user_id, duration=600)
+            await matcher.finish(Message("就是你乱加是吧！死！"))
 
     # 调用添加指令的函数
     add_command(event.group_id, new_command)
